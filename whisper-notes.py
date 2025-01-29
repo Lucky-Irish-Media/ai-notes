@@ -16,9 +16,9 @@ You are an AI specializing in summarizing transcribed voice notes. Below is a tr
 PROMPT = PromptTemplate(input_variables=["history","input"], template=template)
 chain = ConversationChain(
     prompt=PROMPT,
-    verbose=False,
+    verbose=True,
     memory=ConversationBufferMemory(ai_prefix="Assistant:"),
-    llm=Ollama(model="llama3.2"),
+    llm=Ollama(model="llama3.3"),
 )
 
 def transcribe(audio) -> str:
@@ -53,20 +53,6 @@ def get_llm_response(text: str) -> str:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '--library_path',
-        help='Absolute path to dynamic library. Default: using the library provided by `pvleopard`')
-    parser.add_argument(
-        '--model_path',
-        help='Absolute path to Leopard model. Default: using the model provided by `pvleopard`')
-    parser.add_argument(
-        '--disable_automatic_punctuation',
-        action='store_true',
-        help='Disable insertion of automatic punctuation')
-    parser.add_argument(
-        '--disable_speaker_diarization',
-        action='store_true',
-        help='Disable identification of unique speakers')
-    parser.add_argument(
         '--verbose',
         action='store_true',
         help='Print verbose output of the transcription')
@@ -80,10 +66,12 @@ def main():
     
     for audio_path in args.audio_paths:
             transcript = transcribe(audio_path)
-            print(transcript)
+            if (args.verbose):
+                print(transcript)
                 
             summary = get_llm_response(transcript)
-            print(summary)
+            if (args.verbose):
+                print(summary)
 
             notes = summary+"\n\n---\n\nFull Transcript:\n"+transcript
 
